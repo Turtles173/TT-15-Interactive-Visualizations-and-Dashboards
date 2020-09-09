@@ -1,5 +1,81 @@
+// Function to build the charts
+function chartbuilding(id) {
+  d3.json("../data/samples.json").then((data) => {
+    // var samples = data.samples;
 
-// Start with a function and loading up some of the data
+    console.log(data)
+    
+    // Filter the data for the object with the desired sample number
+    var SampleOutcome = samples.filter(dataObjects => dataObjects.id.toString() == sample);
+    var sampleResults = SampleOutcome[0];
+
+    // Grab the variables, sample_vales, otu_ids & the otu_labels
+    var sample_value = sampleResults.sample_values;
+    var otu_ids = sampleResults.out_ids;
+    var otu_labels = sampleResults.otu_labels;
+
+    // Filter to do a bar plot of the top ten
+    // Top 10 results via a slice (values, results and labels))
+    var samplesTop10 = sample_value.slice(0, 10).reverse();
+    var otu_idsTop = otu_ids.slice(0, 10).reverse();
+    var otu_LabelsTop10 = otu_labels.slice(0, 10);
+
+    // Format the Ids
+    var otu_IdsTop10 = otu_idsTop.map(formIDS => "OTU " + formIDS)
+
+    // Create the bar chart
+    var traceBar = {
+      x : samplesTop10,
+      y : otu_IdsTop10,
+      text : otu_LabelsTop10,
+      type : "bar",
+      orientation: "h",
+    };
+    
+    var barChartLayout = {
+      title: "Top 10 OTU Results",
+      margin: {
+        l: 125,
+        r: 125,
+        t: 40,
+        b: 40
+      }
+    };
+    // Set the Variable
+    var chartTrace = [traceBar];
+
+    Plotly.newPlot("bar", chartTrace, barChartLayout);
+
+    // Bubble Chart  
+    var bubbleTrace = {
+      x: otu_ids,
+      y: sample_value,
+      mode: "markers",
+      marker: {
+        size: sample_value,
+        color: otu_ids
+      },
+      text: otu_labels
+    };
+        
+    var bubbleLayout = {
+      title: "Belly Button Bacteria",
+      margin: { t: 20},
+      xaxis: { title: "OTU IDS"},
+      margin: { t: 40}
+    };
+
+    // Set the variable
+    var bubbleChart = [bubbleTrace]
+
+    // Create the plot
+    Plotly.newPlot("bubble", bubbleChart, bubbleLayout);
+
+  });
+  
+}
+
+// Loading up some of the data
 function dataFetch(sample) {
 
   d3.json("../data/samples.json").then((data) => {
@@ -13,18 +89,15 @@ function dataFetch(sample) {
     // Obtain the data from metadata from sample
     var dataResults = d3.select("#sample-metadata");
 
-    // Clear the results
     dataResults.html("");
 
-    // console.log(results)
-
+    // Add the key & value pairs using objects
     Object.entries(results).forEach(([key,value]) => {
       dataResults.append("h6").text(`${key.toUpperCase()}: ${value}`);
     });
     })
 }
-// Test the fetching is working
-dataFetch(978);
+
 
 function demographic(id) {
   // read the json file to get data
@@ -36,21 +109,18 @@ function demographic(id) {
     var result = metadata.filter(meta => meta.id.toString() === id)[0];
 
     // select demographic panel to put data
-    var demoInfo = d3.select("#sample-metadata");
-
-    demoInfo.html("");
+    var demoInfo = d3.select("#selDataset");
     
-    // grab the necessary demographic data data for the id and append the info to the panel
+    // grab the necessary demographic data - appending the info
     Object.entries(result).forEach(([key,value]) => {
-            demoInfo.append("h5").text(`${key.toUpperCase()}: ${value}`);    
+      demoInfo.append("h5").text(`${key.toUpperCase()}: ${value}`);    
     });
   });
 }
-demographic(978);
 
 // Function to amend when the selection changes in the dropdown box
 function selection(id) {
-  dataFetch(sample);
+  dataFetch(id);
   demographic(id);
 }
 
@@ -62,105 +132,12 @@ function init() {
     menu.append("option").text(name).property("value");
   });
 
-  dataFetch(samples.names[0]);
+  dataFetch(data.names[0]);
   demographic(data.names[0]);
-
   });
   
 }
 init();
-
-// // Build the charts to upload
-// function charting(sample) {
-//   d3.json("../data/samples.json").then((data) => {
-//     var samples = data.samples;
-//     console.log(samples)
-
-//     // Filter by ID
-//     var sampleSlice = samples.filter(dataObjects => dataObjects.id == sample);    
-//     var resultsBar = sampleSlice[0];
-
-//   console.log(resultsBar)
-
-//     // Top 10 results via a slice (results and labels))
-//     var samplesValue = resultsBar.sample_values.slice(0, 10).reverse();
-
-//     var idVal = resultsBar.otu_ids.slice(0, 10).reverse();
-    
-//     var idLabels = resultsBar.out_labels.slice(0, 10);
-
-//     console.log(samplesValue)
-
-//     // Create the trace
-//     var trace = {
-//       x : samplesValue,
-//       y : idVal,
-//       text : idLabels,
-//       type : "bar",
-//       orientation: "h",
-//     };
-    
-
-//     var barChartLayout = {
-//       title: "Top 10 OTU Results",
-//       margin: {
-//         l: 125,
-//         r: 125,
-//         t: 40,
-//         b: 40
-//       }
-//     };
-  
-//     var chartTrace = [trace];
-
-//     return trace;
-
-//   });
-
-//   Plotly.newPlot("bar-plot", chartTrace, barChartLayout);
-// };
-
-
-
-// Build the charts to upload
-// function charting(sample) {
-//   d3.json("../data/samples.json").then((data) => {
-//     var chartSamples = data.chartSamples;
-//     // Filter the data for the object with the desired sample number
-//     var sampleNo = chartSamples.filter(dataObjects => dataObjects.id == sample);
-//     var results = sampleNo[0];
-
-    
-    
-    
-    
-//     // Build the charting vars
-//     var otuIds = results.otu_ids;
-//     var otuSampleValues = results.sample_values;
-//     var otuLabels = results.otu_labels;
-//     // var washFrequency = results.wfreq;
-    
-//     // Chart building
-  
-
-    
-// });
-// };
-
-      // Grab the wash frequency (wfreq)
-      // var washFrequency = sampleData.metadata.map(data => data.wfreq)
-      // console.log(`Test: ${washFrequency}`)
-            
-      // Filter by ID
-      // var sampleIDS = sampleData.sample.filter(sam => sam.id == id)[0]
-      // console.log(sampleIDS);
-
-      // Slice to get the top 10 - sample values (sample_value)
-      
-
-
-
-      // Slice to get the top 10 - otu ids (out_ids)
 
 
 
