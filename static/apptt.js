@@ -1,17 +1,40 @@
+// Loading up some of the data
+function dataFetch(id) {
+
+  d3.json("../data/samples.json").then((data) => {
+    var metadata = data.metadata;
+    console.log(metadata)
+    
+    // Filter the data for the object with the desired sample number
+    var sampleNo = metadata.filter(dataObjects => dataObjects.id == id);
+    var results = sampleNo[0];
+
+    // Obtain the data from metadata from sample
+    var dataResults = d3.select("#sample-metadata");
+
+    dataResults.html("");
+
+    // Add the key & value pairs using objects
+    Object.entries(results).forEach(([key,value]) => {
+      dataResults.append("h6").text(`${key.toUpperCase()}: ${value}`);
+    });
+    })
+}
+
 // Function to build the charts
 function chartbuilding(id) {
   d3.json("../data/samples.json").then((data) => {
-    // var samples = data.samples;
+    var samples = data.samples;
 
-    console.log(data)
+    console.log(samples)
     
     // Filter the data for the object with the desired sample number
-    var SampleOutcome = samples.filter(dataObjects => dataObjects.id.toString() == sample);
+    var SampleOutcome = samples.filter(dataObjects => dataObjects.id.toString() == id);
     var sampleResults = SampleOutcome[0];
 
     // Grab the variables, sample_vales, otu_ids & the otu_labels
     var sample_value = sampleResults.sample_values;
-    var otu_ids = sampleResults.out_ids;
+    var otu_ids = sampleResults.otu_ids;
     var otu_labels = sampleResults.otu_labels;
 
     // Filter to do a bar plot of the top ten
@@ -72,32 +95,7 @@ function chartbuilding(id) {
     Plotly.newPlot("bubble", bubbleChart, bubbleLayout);
 
   });
-  
 }
-
-// Loading up some of the data
-function dataFetch(sample) {
-
-  d3.json("../data/samples.json").then((data) => {
-    var metadata = data.metadata;
-    console.log(metadata)
-    
-    // Filter the data for the object with the desired sample number
-    var sampleNo = metadata.filter(dataObjects => dataObjects.id == sample);
-    var results = sampleNo[0];
-
-    // Obtain the data from metadata from sample
-    var dataResults = d3.select("#sample-metadata");
-
-    dataResults.html("");
-
-    // Add the key & value pairs using objects
-    Object.entries(results).forEach(([key,value]) => {
-      dataResults.append("h6").text(`${key.toUpperCase()}: ${value}`);
-    });
-    })
-}
-
 
 function demographic(id) {
   // read the json file to get data
@@ -109,7 +107,7 @@ function demographic(id) {
     var result = metadata.filter(meta => meta.id.toString() === id)[0];
 
     // select demographic panel to put data
-    var demoInfo = d3.select("#selDataset");
+    var demoInfo = d3.selectAll("#selDataset").on("change", selection);
     
     // grab the necessary demographic data - appending the info
     Object.entries(result).forEach(([key,value]) => {
@@ -124,7 +122,7 @@ function selection(id) {
   demographic(id);
 }
 
-// 
+// Render the data
 function init() {
   var menu = d3.select("#selDataset");
   d3.json("../data/samples.json").then((data)=> {
