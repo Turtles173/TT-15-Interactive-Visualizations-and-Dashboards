@@ -97,30 +97,9 @@ function chartbuilding(id) {
   });
 }
 
-// function demographic(id) {
-//   // read the json file to get data
-//   d3.json("../data/samples.json").then((data)=> {
-//     var metadata = data.metadata;
-//     console.log(metadata)
-
-//     // filter meta data info by id
-//     var result = metadata.filter(meta => meta.id.toString() === id)[0];
-
-//     // select demographic panel to put data
-//     var demoInfo = d3.selectAll("#selDataset").on("change", optionChanged);
-    
-//     // grab the necessary demographic data - appending the info
-//     Object.entries(result).forEach(([key,value]) => {
-//       demoInfo.append("h5").text(`${key.toUpperCase()}: ${value}`);    
-//     });
-//   });
-// }
-
-
 // Function to amend when the selection changes in the dropdown box
 function optionChanged(id) {
   dataFetch(id);
-  // demographic(id);
   chartbuilding(id);
 }
 
@@ -133,7 +112,6 @@ function init() {
   });
 
   dataFetch(data.names[0]);
-  // demographic(data.names[0]);
   chartbuilding(data.names[0]);
   });
   
